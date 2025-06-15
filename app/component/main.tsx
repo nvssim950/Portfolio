@@ -1,6 +1,7 @@
 "use client"
 import React, { useState, useEffect, useRef } from 'react';
 import ContactForm from './ContactForm';
+import Image from 'next/image';
 import {
   ChevronDown,
   Github,
@@ -186,7 +187,7 @@ const NeuralNetwork: React.FC<NeuralNetworkProps> = ({ mousePosition, isDarkMode
               : `rgba(99, 102, 241, ${opacity})`;
             
             ctx.beginPath();
-            ctx.moveTo(nodes[i].x, nodes[j].y);
+            ctx.moveTo(nodes[i].x, nodes[i].y);
             ctx.lineTo(nodes[j].x, nodes[j].y);
             ctx.strokeStyle = connectionColor;
             ctx.lineWidth = 0.5;
@@ -260,7 +261,7 @@ const Main: React.FC = () => {
     setIsLoaded(true);
 
     // Generate random particles only on client after mount
-    const newParticles: Particle[] = Array.from({ length: 20 }, (_, index) => ({
+    const newParticles: Particle[] = Array.from({ length: 20 }, () => ({
       left: `${Math.random() * 100}%`,
       top: `${Math.random() * 100}%`,
       animationDelay: `${Math.random() * 3}s`,
@@ -345,7 +346,7 @@ const Main: React.FC = () => {
       title: "Saleor Storefront",
       description: "A production-ready eCommerce storefront powered by Next.js and integrated with Saleor's GraphQL API.",
       tech: ["Next.js", "Tailwind CSS", "TypeScript", "PostgreSQL","Stripe"],
-      image: "PROJ1.PNG",
+      image: "/PROJ1.PNG",
       status: "Live",
       URL:"https://storefront.saleor.io/default-channel",
       GIT:"https://github.com/nvssim950/Saleor-Storefront"
@@ -354,7 +355,7 @@ const Main: React.FC = () => {
       title: "Hashnode Clone",
       description: "The hassle-free blogging platform for engineers, thought-leaders, and the dev community!",
       tech: ["Next.js", "Tailwind CSS", "TypeScript", "PostgreSQL"],
-      image: "PROJ2.PNG",
+      image: "/PROJ2.PNG",
       status: "Open Source",
       URL:"https://hashnode-clone-iota.vercel.app/",
       GIT:"https://github.com/nvssim950/Hashnode"
@@ -363,7 +364,7 @@ const Main: React.FC = () => {
       title: "OpenResume",
       description: "A sleek, customizable resume builder built with Next.js, Tailwind CSS, TypeScript, and PDF rendering using React PDF.",
       tech: ["Next.js", "Tailwind CSS", "TypeScript", "PostgreSQL","Zustand"],
-      image: "PROJ3.PNG",
+      image: "/PROJ3.PNG",
       status: "Beta",
       URL:"https://www.open-resume.com/",
       GIT:"https://github.com/xitanggg/open-resume"
@@ -470,9 +471,9 @@ const Main: React.FC = () => {
           </div>
 
           <div className="flex justify-center space-x-6 mb-12">
-            {[Github, Linkedin, Mail].map((Icon, index) => (
+            {[Github, Linkedin, Mail].map((Icon, iconIndex) => (
               <div
-                key={index}
+                key={iconIndex}
                 className="group relative p-4 rounded-full bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-white/10 backdrop-blur-sm hover:scale-110 transition-all duration-300 cursor-pointer"
               >
                 <Icon className="w-6 h-6 group-hover:text-blue-400 transition-colors" />
@@ -510,12 +511,12 @@ const Main: React.FC = () => {
               </p>
 
               <div className="flex flex-wrap gap-4">
-                {["JavaScript", "TypeScript", "React", "Node.js", "Python", "MongoDB","Supabase","Next.js", "PostgreSQL"].map((tech, index) => (
+                {["JavaScript", "TypeScript", "React", "Node.js", "Python", "MongoDB","Supabase","Next.js", "PostgreSQL"].map((tech, techIndex) => (
                   <span
                     key={tech}
-                    className={`scroll-animate px-4 py-2 rounded-full bg-gradient-to-r from-blue-600/20 to-purple-600/20 border ${themeClasses.border} text-sm hover:scale-105 transition-all duration-500 cursor-default ${getAnimationClass(`tech-${index}`, 'scale')}`}
-                    id={`tech-${index}`}
-                    style={{ transitionDelay: `${index * 100}ms` }}
+                    className={`scroll-animate px-4 py-2 rounded-full bg-gradient-to-r from-blue-600/20 to-purple-600/20 border ${themeClasses.border} text-sm hover:scale-105 transition-all duration-500 cursor-default ${getAnimationClass(`tech-${techIndex}`, 'scale')}`}
+                    id={`tech-${techIndex}`}
+                    style={{ transitionDelay: `${techIndex * 100}ms` }}
                   >
                     {tech}
                   </span>
@@ -527,12 +528,12 @@ const Main: React.FC = () => {
             <div className={`scroll-animate ${getAnimationClass('skills-section', 'fade-left')}`} id="skills-section">
               <div className="space-y-8">
                 <h3 className="text-2xl font-semibold mb-6 text-blue-400">Technical Expertise</h3>
-                {skills.map((skill, index) => (
+                {skills.map((skill, skillIndex) => (
                   <div 
                     key={skill.name} 
-                    className={`scroll-animate group ${getAnimationClass(`skill-${index}`, 'slide-up')}`}
-                    id={`skill-${index}`}
-                    style={{ transitionDelay: `${index * 200}ms` }}
+                    className={`scroll-animate group ${getAnimationClass(`skill-${skillIndex}`, 'slide-up')}`}
+                    id={`skill-${skillIndex}`}
+                    style={{ transitionDelay: `${skillIndex * 200}ms` }}
                   >
                     <div className="flex justify-between items-center mb-3">
                       <div className="flex items-center space-x-3">
@@ -546,21 +547,21 @@ const Main: React.FC = () => {
                       <div
                         className={`h-full bg-gradient-to-r ${skill.color} rounded-full transition-all duration-1000 ease-out group-hover:scale-105 origin-left`}
                         style={{ 
-                          width: animatedElements.has(`skill-${index}`) ? `${skill.level}%` : '0%',
-                          transitionDelay: `${index * 200 + 500}ms`
+                          width: animatedElements.has(`skill-${skillIndex}`) ? `${skill.level}%` : '0%',
+                          transitionDelay: `${skillIndex * 200 + 500}ms`
                         }}
                       />
                     </div>
 
                     <div className="flex flex-wrap gap-2">
-                      {skill.technologies.map((tech, techIndex) => (
+                      {skill.technologies.map((tech, techSkillIndex) => (
                         <span
                           key={tech}
                           className={`px-2 py-1 ${isDarkMode ? 'bg-gray-800/50 text-gray-300 border-gray-700/50' : 'bg-gray-100 text-gray-700 border-gray-300/50'} text-xs rounded border hover:border-blue-500/50 transition-colors`}
                           style={{ 
-                            transitionDelay: `${index * 200 + techIndex * 100 + 700}ms`,
-                            opacity: animatedElements.has(`skill-${index}`) ? 1 : 0,
-                            transform: animatedElements.has(`skill-${index}`) ? 'translateY(0)' : 'translateY(10px)'
+                            transitionDelay: `${skillIndex * 200 + techSkillIndex * 100 + 700}ms`,
+                            opacity: animatedElements.has(`skill-${skillIndex}`) ? 1 : 0,
+                            transform: animatedElements.has(`skill-${skillIndex}`) ? 'translateY(0)' : 'translateY(10px)'
                           }}
                         >
                           {tech}
@@ -583,15 +584,21 @@ const Main: React.FC = () => {
           </h2>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {projects.map((project, index) => (
+            {projects.map((project, projectIndex) => (
               <div
                 key={project.title}
-                className={`scroll-animate group relative overflow-hidden rounded-2xl bg-gradient-to-br ${themeClasses.cardBg} border ${themeClasses.border} backdrop-blur-sm hover:scale-105 transition-all duration-500 ${getAnimationClass(`project-${index}`, 'scale')}`}
-                id={`project-${index}`}
-                style={{ transitionDelay: `${index * 200}ms` }}
+                className={`scroll-animate group relative overflow-hidden rounded-2xl bg-gradient-to-br ${themeClasses.cardBg} border ${themeClasses.border} backdrop-blur-sm hover:scale-105 transition-all duration-500 ${getAnimationClass(`project-${projectIndex}`, 'scale')}`}
+                id={`project-${projectIndex}`}
+                style={{ transitionDelay: `${projectIndex * 200}ms` }}
               >
                 <div className={`h-48 relative overflow-hidden`}>
-                  <img src={project.image} alt={project.title} />
+                  <Image 
+                    src={project.image} 
+                    alt={project.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
                 </div>
 
                 <div className="p-6">
