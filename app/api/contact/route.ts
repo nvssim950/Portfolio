@@ -14,20 +14,20 @@ export async function POST(request: NextRequest) {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: process.env.gmail_user,
-        pass: process.env.gmail_pass, // App password
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASS, // App password
       },
     });
 
     // Send email to yourself
     await transporter.sendMail({
-      from: process.env.gmail_user,
+      from: process.env.GMAIL_USER,
       to: "nassimbddm@gmail.com", // Send to yourself
       subject: `Contact Form: ${subject}`,
       html: `
         <h3>New Contact Form Message</h3>
         <p><strong>From:</strong> ${name} (${email})</p>
-            <p><strong>Subject:</strong> ${subject}</p>
+        <p><strong>Subject:</strong> ${subject}</p>
         <p><strong>Message:</strong></p>
         <p>${message}</p>
       `,
@@ -35,6 +35,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ message: 'Email sent!' });
   } catch (error) {
+    console.error('Email sending failed:', error);
     return NextResponse.json({ error: 'Failed to send' }, { status: 500 });
   }
 }
