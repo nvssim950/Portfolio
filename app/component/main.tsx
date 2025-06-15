@@ -10,7 +10,6 @@ import {
   Code,
   Database,
   Server,
-  Globe,
   GitBranch,
   Shield,
   Sun,
@@ -130,7 +129,7 @@ const NeuralNetwork: React.FC<NeuralNetworkProps> = ({ mousePosition, isDarkMode
       const connectionDistance = 120;
       
       // Update and draw nodes
-      nodes.forEach((node, i) => {
+      nodes.forEach((node) => {
         // Mouse attraction/repulsion
         const dx = mousePosition.x - node.x;
         const dy = mousePosition.y - node.y;
@@ -261,7 +260,7 @@ const Main: React.FC = () => {
     setIsLoaded(true);
 
     // Generate random particles only on client after mount
-    const newParticles: Particle[] = Array.from({ length: 20 }).map(() => ({
+    const newParticles: Particle[] = Array.from({ length: 20 }, (_, index) => ({
       left: `${Math.random() * 100}%`,
       top: `${Math.random() * 100}%`,
       animationDelay: `${Math.random() * 3}s`,
@@ -404,9 +403,9 @@ const Main: React.FC = () => {
         <div className={`absolute inset-0 bg-gradient-to-br ${themeClasses.gradientOverlay}`} style={{ zIndex: 3 }} />
         
         {/* Floating particles */}
-        {particles.map((dot, i) => (
+        {particles.map((dot, index) => (
           <div
-            key={i}
+            key={index}
             className={`absolute w-1 h-1 ${themeClasses.floatingParticles} rounded-full opacity-20 animate-pulse`}
             style={{
               left: dot.left,
@@ -466,7 +465,7 @@ const Main: React.FC = () => {
               DEVELOPER
             </h1>
             <p className={`text-xl md:text-2xl ${themeClasses.textSecondary} mb-8 max-w-2xl mx-auto leading-relaxed`}>
-              Crafting digital experiences that push the boundaries of what's possible on the web
+              Crafting digital experiences that push the boundaries of what&apos;s possible on the web
             </p>
           </div>
 
@@ -490,6 +489,7 @@ const Main: React.FC = () => {
           </button>
         </div>
       </section>
+      
       {/* About Section */}
       <section id="about" className="min-h-screen flex items-center py-20 relative z-10">
         <div className="max-w-6xl mx-auto px-6">
@@ -634,10 +634,10 @@ const Main: React.FC = () => {
         <div className="max-w-6xl mx-auto px-6">
           <div className={`scroll-animate text-center mb-16 ${getAnimationClass('contact-header', 'fade-up')}`} id="contact-header">
             <h2 className="text-5xl font-bold mb-8 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              Let's Work Together
+              Let&apos;s Work Together
             </h2>
             <p className={`text-xl ${themeClasses.textSecondary} mb-8 max-w-2xl mx-auto leading-relaxed`}>
-              Ready to turn your vision into reality? Let's collaborate and build something exceptional together.
+              Ready to turn your vision into reality? Let&apos;s collaborate and build something exceptional together.
             </p>
           </div>
 
