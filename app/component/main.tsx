@@ -1,3 +1,4 @@
+
 "use client"
 import React, { useState, useEffect, useRef } from 'react';
 import ContactForm from './ContactForm';
@@ -15,7 +16,9 @@ import {
   Shield,
   Sun,
   Moon,
-  LucideIcon
+  LucideIcon,
+  Menu,
+  X
 } from 'lucide-react';
 
 // Type definitions
@@ -100,10 +103,11 @@ const NeuralNetwork: React.FC<NeuralNetworkProps> = ({ mousePosition, isDarkMode
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Initialize nodes
+    // Initialize nodes - fewer on mobile
     const initNodes = () => {
       const nodes: Node[] = [];
-      const nodeCount = 80;
+      const isMobile = window.innerWidth < 768;
+      const nodeCount = isMobile ? 40 : 80; // Reduce nodes on mobile for performance
       
       for (let i = 0; i < nodeCount; i++) {
         nodes.push({
@@ -126,8 +130,9 @@ const NeuralNetwork: React.FC<NeuralNetworkProps> = ({ mousePosition, isDarkMode
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
       const nodes = nodesRef.current;
-      const mouseInfluence = 150;
-      const connectionDistance = 120;
+      const isMobile = window.innerWidth < 768;
+      const mouseInfluence = isMobile ? 100 : 150; // Reduce influence on mobile
+      const connectionDistance = isMobile ? 80 : 120; // Reduce connection distance on mobile
       
       // Update and draw nodes
       nodes.forEach((node) => {
@@ -251,6 +256,7 @@ const Main: React.FC = () => {
   const [currentSection, setCurrentSection] = useState<string>('hero');
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const animatedElements = useScrollAnimation();
 
@@ -260,8 +266,10 @@ const Main: React.FC = () => {
   useEffect(() => {
     setIsLoaded(true);
 
-    // Generate random particles only on client after mount
-    const newParticles: Particle[] = Array.from({ length: 20 }, () => ({
+    // Generate random particles only on client after mount - fewer on mobile
+    const isMobile = window.innerWidth < 768;
+    const particleCount = isMobile ? 10 : 20;
+    const newParticles: Particle[] = Array.from({ length: particleCount }, () => ({
       left: `${Math.random() * 100}%`,
       top: `${Math.random() * 100}%`,
       animationDelay: `${Math.random() * 3}s`,
@@ -297,10 +305,15 @@ const Main: React.FC = () => {
 
   const scrollToSection = (sectionId: string) => {
     document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+    setIsMobileMenuOpen(false); // Close mobile menu after navigation
   };
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   // Animation helper function
@@ -381,115 +394,164 @@ const Main: React.FC = () => {
 
   return (
     <div
-      ref={containerRef}
-      className={`${themeClasses.bg} ${themeClasses.text} overflow-hidden relative transition-colors duration-500`}
-    >
-      {/* Animated Background */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        {/* Neural Network Animation */}
-        <NeuralNetwork mousePosition={mousePosition} isDarkMode={isDarkMode} />
-        
-        {/* Mouse-following radial gradient */}
+    ref={containerRef}
+    className={`${themeClasses.bg} ${themeClasses.text} overflow-hidden relative transition-colors duration-500`}
+  >
+    {/* Animated Background */}
+    <div className="fixed inset-0 z-0 pointer-events-none">
+      {/* Neural Network Animation */}
+      <NeuralNetwork mousePosition={mousePosition} isDarkMode={isDarkMode} />
+      
+      {/* Mouse-following radial gradient */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `radial-gradient(400px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(59, 130, 246, 0.08), transparent 40%)`,
+          transition: 'background-position 0.1s ease',
+          willChange: 'background',
+          zIndex: 2,
+        }}
+      />
+      
+      {/* Optional static gradient overlay */}
+      <div className={`absolute inset-0 bg-gradient-to-br ${themeClasses.gradientOverlay}`} style={{ zIndex: 3 }} />
+      
+      {/* Floating particles */}
+      {particles.map((dot, index) => (
         <div
-          className="absolute inset-0"
+          key={index}
+          className={`absolute w-1 h-1 ${themeClasses.floatingParticles} rounded-full opacity-20 animate-pulse`}
           style={{
-            background: `radial-gradient(400px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(59, 130, 246, 0.08), transparent 40%)`,
-            transition: 'background-position 0.1s ease',
-            willChange: 'background',
-            zIndex: 2,
+            left: dot.left,
+            top: dot.top,
+            animationDelay: dot.animationDelay,
+            animationDuration: dot.animationDuration,
+            pointerEvents: 'none',
+            zIndex: 4,
           }}
         />
-        
-        {/* Optional static gradient overlay */}
-        <div className={`absolute inset-0 bg-gradient-to-br ${themeClasses.gradientOverlay}`} style={{ zIndex: 3 }} />
-        
-        {/* Floating particles */}
-        {particles.map((dot, index) => (
-          <div
-            key={index}
-            className={`absolute w-1 h-1 ${themeClasses.floatingParticles} rounded-full opacity-20 animate-pulse`}
-            style={{
-              left: dot.left,
-              top: dot.top,
-              animationDelay: dot.animationDelay,
-              animationDuration: dot.animationDuration,
-              pointerEvents: 'none',
-              zIndex: 4,
-            }}
-          />
-        ))}
-      </div>
+      ))}
+    </div>
 
-      {/* Navigation */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${isLoaded ? 'translate-y-0' : '-translate-y-full'}`}>
-        <div className={`backdrop-blur-md ${themeClasses.navBg} border-b ${themeClasses.border}`}>
-          <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-            <div className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-              Baheddi Nassim
-            </div>
-            <div className="flex items-center space-x-8">
-              <div className="flex space-x-8">
-                {(['hero', 'about', 'projects', 'contact'] as const).map((section) => (
-                  <button
-                    key={section}
-                    onClick={() => scrollToSection(section)}
-                    className={`capitalize transition-all duration-300 hover:text-blue-400 ${
-                      currentSection === section ? 'text-blue-400' : themeClasses.textSecondary
-                    }`}
-                  >
-                    {section === 'hero' ? 'Home' : section}
-                  </button>
-                ))}
-              </div>
+    {/* Navigation */}
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${isLoaded ? 'translate-y-0' : '-translate-y-full'}`}>
+      <div className={`backdrop-blur-md ${themeClasses.navBg} border-b ${themeClasses.border}`}>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+          {/* Logo */}
+          <div className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+            Baheddi Nassim
+          </div>
 
-              {/* Theme Toggle */}
-              <button
-                onClick={toggleTheme}
-                className={`p-3 rounded-full bg-gradient-to-r from-blue-600/20 to-purple-600/20 border ${themeClasses.border} backdrop-blur-sm hover:scale-110 transition-all duration-300 group`}
-              >
-                {isDarkMode ? (
-                  <Sun className="w-5 h-5 text-blue-400 group-hover:text-yellow-400 transition-colors" />
-                ) : (
-                  <Moon className="w-5 h-5 text-blue-400 group-hover:text-purple-400 transition-colors" />
-                )}
-              </button>
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            <div className="flex space-x-8">
+              {(['hero', 'about', 'projects', 'contact'] as const).map((section) => (
+                <button
+                  key={section}
+                  onClick={() => scrollToSection(section)}
+                  className={`capitalize transition-all duration-300 hover:text-blue-400 ${
+                    currentSection === section ? 'text-blue-400' : themeClasses.textSecondary
+                  }`}
+                >
+                  {section === 'hero' ? 'Home' : section}
+                </button>
+              ))}
             </div>
+
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className={`p-3 rounded-full bg-gradient-to-r from-blue-600/20 to-purple-600/20 border ${themeClasses.border} backdrop-blur-sm hover:scale-110 transition-all duration-300 group`}
+            >
+              {isDarkMode ? (
+                <Sun className="w-5 h-5 text-blue-400 group-hover:text-yellow-400 transition-colors" />
+              ) : (
+                <Moon className="w-5 h-5 text-blue-400 group-hover:text-purple-400 transition-colors" />
+              )}
+            </button>
+          </div>
+
+          {/* Mobile Navigation */}
+          <div className="md:hidden flex items-center space-x-4">
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className={`p-2 sm:p-3 rounded-full bg-gradient-to-r from-blue-600/20 to-purple-600/20 border ${themeClasses.border} backdrop-blur-sm hover:scale-110 transition-all duration-300 group`}
+            >
+              {isDarkMode ? (
+                <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400 group-hover:text-yellow-400 transition-colors" />
+              ) : (
+                <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400 group-hover:text-purple-400 transition-colors" />
+              )}
+            </button>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={toggleMobileMenu}
+              className={`p-2 sm:p-3 rounded-full bg-gradient-to-r from-blue-600/20 to-purple-600/20 border ${themeClasses.border} backdrop-blur-sm hover:scale-110 transition-all duration-300`}
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-5 h-5 text-blue-400" />
+              ) : (
+                <Menu className="w-5 h-5 text-blue-400" />
+              )}
+            </button>
           </div>
         </div>
-      </nav>
 
-      {/* Hero Section */}
-      <section id="hero" className="min-h-screen flex items-center justify-center relative z-10">
-        <div className={`text-center transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <div className="mb-8">
-            <h1 className="text-7xl md:text-9xl font-black mb-4 bg-gradient-to-r from-blue-400 via-purple-500 to-cyan-400 bg-clip-text text-transparent animate-pulse">
-              DEVELOPER
-            </h1>
-            <p className={`text-xl md:text-2xl ${themeClasses.textSecondary} mb-8 max-w-2xl mx-auto leading-relaxed`}>
-              Crafting digital experiences that push the boundaries of what&apos;s possible on the web
-            </p>
-          </div>
-
-          <div className="flex justify-center space-x-6 mb-12">
-            {[Github, Linkedin, Mail].map((Icon, iconIndex) => (
-              <div
-                key={iconIndex}
-                className="group relative p-4 rounded-full bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-white/10 backdrop-blur-sm hover:scale-110 transition-all duration-300 cursor-pointer"
+        {/* Mobile Menu Dropdown */}
+        <div className={`md:hidden transition-all duration-300 overflow-hidden ${
+          isMobileMenuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'
+        }`}>
+          <div className={`px-4 sm:px-6 py-4 space-y-4 border-t ${themeClasses.border}`}>
+            {(['hero', 'about', 'projects', 'contact'] as const).map((section) => (
+              <button
+                key={section}
+                onClick={() => scrollToSection(section)}
+                className={`block w-full text-left capitalize py-2 transition-all duration-300 hover:text-blue-400 ${
+                  currentSection === section ? 'text-blue-400' : themeClasses.textSecondary
+                }`}
               >
-                <Icon className="w-6 h-6 group-hover:text-blue-400 transition-colors" />
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 group-hover:opacity-20 transition-opacity blur-xl" />
-              </div>
+                {section === 'hero' ? 'Home' : section}
+              </button>
             ))}
           </div>
-
-          <button
-            onClick={() => scrollToSection('about')}
-            className={`group flex items-center mx-auto ${themeClasses.textMuted} hover:${themeClasses.text} transition-colors animate-bounce`}
-          >
-            <ChevronDown className="w-8 h-8 group-hover:scale-110 transition-transform" />
-          </button>
         </div>
-      </section>
+      </div>
+    </nav>
+
+    {/* Hero Section */}
+    <section id="hero" className="min-h-screen flex items-center justify-center relative z-10 px-4 sm:px-6">
+      <div className={`text-center transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-9xl font-black mb-4 bg-gradient-to-r from-blue-400 via-purple-500 to-cyan-400 bg-clip-text text-transparent animate-pulse leading-tight">
+            DEVELOPER
+          </h1>
+          <p className={`text-base sm:text-lg md:text-xl lg:text-2xl ${themeClasses.textSecondary} mb-6 sm:mb-8 max-w-xl lg:max-w-2xl mx-auto leading-relaxed px-4`}>
+            Crafting digital experiences that push the boundaries of what&apos;s possible on the web
+          </p>
+        </div>
+
+        <div className="flex justify-center space-x-4 sm:space-x-6 mb-8 sm:mb-12">
+          {[Github, Linkedin, Mail].map((Icon, iconIndex) => (
+            <div
+              key={iconIndex}
+              className="group relative p-3 sm:p-4 rounded-full bg-gradient-to-r from-blue-600/20 to-purple-600/20 border border-white/10 backdrop-blur-sm hover:scale-110 transition-all duration-300 cursor-pointer"
+            >
+              <Icon className="w-5 h-5 sm:w-6 sm:h-6 group-hover:text-blue-400 transition-colors" />
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 group-hover:opacity-20 transition-opacity blur-xl" />
+            </div>
+          ))}
+        </div>
+
+        <button
+          onClick={() => scrollToSection('about')}
+          className={`group flex items-center mx-auto ${themeClasses.textMuted} hover:${themeClasses.text} transition-colors animate-bounce`}
+        >
+          <ChevronDown className="w-6 h-6 sm:w-8 sm:h-8 group-hover:scale-110 transition-transform" />
+        </button>
+      </div>
+    </section>
       
       {/* About Section */}
       <section id="about" className="min-h-screen flex items-center py-20 relative z-10">
